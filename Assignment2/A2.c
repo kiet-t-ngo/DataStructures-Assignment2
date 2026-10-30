@@ -52,6 +52,15 @@ void push(Stack* stack, char* newUrl)
     stack->top = newNode;
 }
 
+// METHOD       : isStackEmpty
+// DESCRIPTION  : Checks if the stack is empty
+// RETURNS      : returns true if stack is empty, otherwise return false
+bool isStackEmpty(Stack* stack)
+{
+    //return stack->top == -1;
+    return stack->top == NULL;
+}
+
 int main(void)
 {
 
