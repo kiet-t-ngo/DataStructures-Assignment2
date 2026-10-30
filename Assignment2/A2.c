@@ -87,6 +87,20 @@ char* pop(Stack* stack)
     return poppedUrl;
 }
 
+// METHOD       : peekStack()
+// DESCRIPTION  : Returns the URL from the top of the stack without removing it
+// RETURNS      : char* pointer to the URL string at the top of the stack or NULL if the stack is empty
+char* peekStack(Stack* stack)
+{
+    // Calls isStackEmpty() method to check if stack is empty
+    // If it is empty, return null to exit function
+    if (isStackEmpty(stack))
+    {
+        return NULL;
+    }
+    return stack->top->url;
+}
+
 int main(void)
 {
 
