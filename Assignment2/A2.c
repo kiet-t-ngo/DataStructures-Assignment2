@@ -61,6 +61,32 @@ bool isStackEmpty(Stack* stack)
     return stack->top == NULL;
 }
 
+// METHOD       : pop()
+// DESCRIPTION  : Removes and returns the URL from the top stack
+// RETURNS      : char* string containing the popped URL or NULL if the stack is empty
+char* pop(Stack* stack)
+{
+    // Calls isStackEmpty() method to check if stack is empty
+    // If it is empty, return null to exit function
+    if (isStackEmpty(stack)) 
+    {
+        return NULL;
+    }
+
+    StackNode* node = stack->top;
+    // allocating memory for url
+    char* poppedUrl = (char*)malloc(URL_SIZE * sizeof(char));
+    // safe check, if allocation fails, display error and exit
+    if (poppedUrl == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(EXIT_FAILURE);
+    }
+    strncpy(poppedUrl, node->url, URL_SIZE);
+    stack->top = node->next;
+    free(node); // free node for memory
+    return poppedUrl;
+}
+
 int main(void)
 {
 
