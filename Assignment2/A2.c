@@ -44,6 +44,8 @@ bool isStackEmpty(Stack* stack);
 // Function prototype for queue
 Queue* InititalizeQueue(void);
 bool isQueueEmpty(Queue* queue);
+//QueueNode* CreateNewNode(char url);
+void enqueue(Queue* queue, char* newUrl);
 
 // METHOD       : push()
 // DESCRIPTION  : Adds a new URL to the top of the stack
@@ -156,6 +158,69 @@ Queue* InititalizeQueue(void)
 bool isQueueEmpty(Queue* queue)
 {
     return queue->front == NULL;
+}
+
+// From Week5_Queue example
+/*QueueNode* CreateNewNode(char url)
+{
+    // allocating memory for node
+    QueueNode* newNode = (QueueNode*)malloc(sizeof(QueueNode));
+    // safe check, if allocation fails or is out of memory, display error and exit
+    if (newNode == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // copy data and initializing fields
+    strncpy(newNode->url, url, URL_SIZE - 1);
+    newNode->url[URL_SIZE - 1] = '\0'; // checks if string is NULL terminated
+    newNode->next = NULL;
+    return newNode;
+}*/
+
+// METHOD       : enqueue()
+// DESCRIPTION  : Adds a new URL to the rear of the queue
+// RETURNS      : returns 0 or nothing because void
+void enqueue(Queue* queue, char* newUrl)
+{
+    // allocating memory for node
+    QueueNode* newNode = (QueueNode*)malloc(sizeof(QueueNode));
+
+    /* // From Week5_Queue example
+    if (queue == NULL)
+    {
+        //queue = InititalizeQueue();
+    }
+    
+    QueueNode* toEnqueue = CreateNewNode(elementToInsert);
+    */
+
+    // safe check, if allocation fails or is out of memory, display error and exit
+    if (newNode == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(EXIT_FAILURE);
+    }
+
+    // copy data and initializing fields
+    strncpy(newNode->url, newUrl, URL_SIZE - 1);
+    newNode->url[URL_SIZE - 1] = '\0'; // checks if string is NULL terminated
+    // set pointer to the next node to NULL since this new node is being added to the rear/end of queue
+    newNode->next = NULL; 
+    
+    // if queue is empty, the new node is both the first (front) and last (rear) items in the queue
+    // and set both pointers to newNode
+    if (isQueueEmpty(queue))
+    {
+        queue->front = newNode;
+        queue->rear = newNode;
+    }
+    else
+    {
+        // connect the last rear node to the new node by updating next pointer
+        queue->rear->next = newNode;
+        // update the rear pointer so it points to the new node making it the end of the queue
+        queue->rear = newNode;
+    }
 }
 
 int main(void)
