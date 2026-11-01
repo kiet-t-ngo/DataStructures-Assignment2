@@ -46,6 +46,7 @@ Queue* InititalizeQueue(void);
 bool isQueueEmpty(Queue* queue);
 //QueueNode* CreateNewNode(char url);
 void enqueue(Queue* queue, char* newUrl);
+char* dequeue(Queue* queue);
 
 // METHOD       : push()
 // DESCRIPTION  : Adds a new URL to the top of the stack
@@ -83,9 +84,10 @@ bool isStackEmpty(Stack* stack)
 char* pop(Stack* stack)
 {
     // Calls isStackEmpty() method to check if stack is empty
-    // If it is empty, return null to exit function
+    // If it is empty, display error and return null
     if (isStackEmpty(stack)) 
     {
+        printf("Stack is Empty");
         return NULL;
     }
 
@@ -192,7 +194,7 @@ void enqueue(Queue* queue, char* newUrl)
         //queue = InititalizeQueue();
     }
     
-    QueueNode* toEnqueue = CreateNewNode(elementToInsert);
+    QueueNode* toEnqueue = CreateNewNode(newUrl);
     */
 
     // safe check, if allocation fails or is out of memory, display error and exit
@@ -221,6 +223,35 @@ void enqueue(Queue* queue, char* newUrl)
         // update the rear pointer so it points to the new node making it the end of the queue
         queue->rear = newNode;
     }
+}
+
+// METHOD       : dequeue()
+// DESCRIPTION  : Removes and returns the URL from the front of the queue
+// RETURNS      : char* string containing the dequeud URL or NULL if the queue is empty
+char* dequeue(Queue* queue)
+{
+    // Calls isQueueEmpty() method to check if queue is empty
+    // If it is empty, display error and return null
+    if (IsQueueEmpty(queue)) 
+    {
+        printf("Queue is Empty");
+        return NULL;
+    }
+
+    // store a reference to the front node that is about to be removed
+    QueueNode* nodeToDequeue = queue->front;
+
+    // allocating memory for url
+    char* dequeuedUrl = (char*)malloc(URL_SIZE * sizeof(char));
+    // safe check, if allocation fails or is out of memory, display error and exit
+    if (dequeuedUrl == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(EXIT_FAILURE);
+    }
+    strncpy(dequeuedUrl, nodeToDequeue->url, URL_SIZE);
+    queue->front = nodeToDequeue->next;
+    free(nodeToDequeue); // free node for memory
+    return dequeuedUrl;
 }
 
 int main(void)
