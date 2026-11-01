@@ -24,12 +24,26 @@ typedef struct {
     StackNode* top;
 } Stack;
 
+typedef struct QueueNode {
+    char url[URL_SIZE];
+    struct QueueNode* next;
+} QueueNode;
 
-// Function prototype
+typedef struct {
+    QueueNode* front; // head pointer
+    QueueNode* rear; // tail pointer
+} Queue;
+
+// Function prototype for stack
+Stack* InitializeStack(void);
 void push(Stack* stack, char* newUrl);
 char* pop(Stack* stack);
 char* peekStack(Stack* stack);
 bool isStackEmpty(Stack* stack);
+
+// Function prototype for queue
+Queue* InititalizeQueue(void);
+
 
 // METHOD       : push()
 // DESCRIPTION  : Adds a new URL to the top of the stack
@@ -101,6 +115,10 @@ char* peekStack(Stack* stack)
     return stack->top->url;
 }
 
+// METHOD       : InitializeStack()
+// DESCRIPTION  : Allocates memory for new empty stack, checks for memory allocation
+//              : and sets stack top pointer to NULL
+// RETURNS      : Pointer to newly initialized stack
 Stack* InitializeStack(void) 
 {
     // allocating memory for node
@@ -112,6 +130,24 @@ Stack* InitializeStack(void)
     }
     stack->top = NULL;
     return stack;
+}
+
+// METHOD       : InitializeQueue()
+// DESCRIPTION  : Allocates memory for new empty queue, checks for memory allocation
+//              : and sets queue front and rear pointer to NULL
+// RETURNS      : Pointer to newly initialized queue
+Queue* InititalizeQueue(void) 
+{
+    // allocating memory for node
+    Queue* queue = (Queue*)malloc(sizeof(Queue));
+    // safe check, if allocation fails or is out of memory, display error and exit
+    if (queue == NULL) {
+        printf("No Memory");
+        exit(EXIT_FAILURE);
+    }
+    queue->front = NULL;
+    queue->rear = NULL;
+    return queue;
 }
 
 int main(void)
