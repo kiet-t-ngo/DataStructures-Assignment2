@@ -43,7 +43,7 @@ bool isStackEmpty(Stack* stack);
 
 // Function prototype for queue
 Queue* InititalizeQueue(void);
-
+bool isQueueEmpty(Queue* queue);
 
 // METHOD       : push()
 // DESCRIPTION  : Adds a new URL to the top of the stack
@@ -148,6 +148,14 @@ Queue* InititalizeQueue(void)
     queue->front = NULL;
     queue->rear = NULL;
     return queue;
+}
+
+// METHOD       : isQueueEmpty
+// DESCRIPTION  : Checks if the queue is empty
+// RETURNS      : returns true if queue is empty, otherwise return false
+bool isQueueEmpty(Queue* queue)
+{
+    return queue->front == NULL;
 }
 
 int main(void)
