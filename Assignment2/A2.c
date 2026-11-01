@@ -76,7 +76,7 @@ char* pop(Stack* stack)
     StackNode* node = stack->top;
     // allocating memory for url
     char* poppedUrl = (char*)malloc(URL_SIZE * sizeof(char));
-    // safe check, if allocation fails, display error and exit
+    // safe check, if allocation fails or is out of memory, display error and exit
     if (poppedUrl == NULL) {
         printf("Memory allocation failed!\n");
         exit(EXIT_FAILURE);
@@ -101,7 +101,21 @@ char* peekStack(Stack* stack)
     return stack->top->url;
 }
 
+Stack* InitializeStack(void) 
+{
+    // allocating memory for node
+    Stack* stack = (Stack*)malloc(sizeof(Stack));
+    // safe check, if allocation fails or is out of memory, display error and exit
+    if (stack == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(EXIT_FAILURE);
+    }
+    stack->top = NULL;
+    return stack;
+}
+
 int main(void)
 {
-
+    Stack* backStack = InitializeStack();
+    Stack* forwardStack = InitializeStack();
 }
