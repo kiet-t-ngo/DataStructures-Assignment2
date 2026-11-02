@@ -47,6 +47,7 @@ bool isQueueEmpty(Queue* queue);
 //QueueNode* CreateNewNode(char url);
 void enqueue(Queue* queue, char* newUrl);
 char* dequeue(Queue* queue);
+char* peekQueue(Queue* queue);
 
 // METHOD       : push()
 // DESCRIPTION  : Adds a new URL to the top of the stack
@@ -252,6 +253,20 @@ char* dequeue(Queue* queue)
     queue->front = nodeToDequeue->next;
     free(nodeToDequeue); // free node for memory
     return dequeuedUrl;
+}
+
+// METHOD       : peekQueue()
+// DESCRIPTION  : Returns the URL from the front of the queue without removing it
+// RETURNS      : char* pointer to the URL string at the front of the queue or NULL if the queue is empty
+char* peekQueue(Queue* queue)
+{
+    // Calls isQueueEmpty() method to check if queue is empty
+    // If it is empty, return null to exit function
+    if (isQueueEmpty(queue))
+    {
+        return NULL;
+    }
+    return queue->front->url;
 }
 
 int main(void)
