@@ -269,8 +269,28 @@ char* peekQueue(Queue* queue)
     return queue->front->url;
 }
 
+void DisplayMenu()
+{
+    printf("\n---- Browser History Manager ----\n");
+    printf("1. Visit New Web Page\n");
+    printf("2. Navigate Backward\n");
+    printf("3. Navigate Forward\n");
+    printf("4. Display Current Page\n");
+    printf("5. Browsing History Log\n");
+    printf("6. Exit\n");
+    printf("Choice (1-6): ");
+}
+
 int main(void)
 {
     Stack* backStack = InitializeStack();
     Stack* forwardStack = InitializeStack();
+
+    int menuOption;
+
+    // run while menuOption is not 6 (exit)
+    do
+    {
+        DisplayMenu();
+    } while (menuOption != 6);
 }
