@@ -55,6 +55,8 @@ void DisplayMenu();
 void ReadInputString(char* buffer, int size);
 void visitNewWebPage(Stack* backStack, Stack* forwardStack, Queue* historyQueue, char* currentUrl);
 void navigateBack(Stack* backStack, Stack* forwardStack, Queue* historyQueue, char* currentUrl);
+void navigateForward(Stack* backStack, Stack* forwardStack, Queue* historyQueue, char* currentUrl);
+void displayCurrentPage(char* currentUrl);
 
 // METHOD       : push()
 // DESCRIPTION  : Adds a new URL to the top of the stack
@@ -373,10 +375,44 @@ void navigateBack(Stack* backStack, Stack* forwardStack, Queue* historyQueue, ch
         // free memory
         free(prevUrl);
 
-        char* current = peekStack(backStack);
-
         printf("\nNavigated back to: %s\n", currentUrl);
     }
+}
+
+// METHOD       : navigateForward()
+// DESCRIPTION  : Navigates forward to next web page url by popping the url from the forward stack
+//              : Pushes the current URL to the back stack, and updates current URL
+// RETURNS      : returns 0 or nothing because void
+void navigateForward(Stack* backStack, Stack* forwardStack, Queue* historyQueue, char* currentUrl)
+{
+    // checks if forwardStack is empty and displays error if it is empty
+    if (isStackEmpty(forwardStack))
+    {
+        printf("No page to go forward to.\n");
+    }
+    else
+    {
+        // push the current page to the back stack since we are navigating forward
+        push(backStack, currentUrl);
+
+        // Pop the next page from the forward stack
+        char* nextUrl = pop(forwardStack);
+        // update the current page
+        strncpy(currentUrl, nextUrl, URL_SIZE);
+        // free memory
+        free(nextUrl);
+
+        printf("\nNavigated forward to: %s\n", currentUrl);
+    }
+
+}
+
+// METHOD       : displayCurrentPage()
+// DESCRIPTION  : Displays the currentUrl page (Will show None if there are no currentUrl pages)
+// RETURNS      : returns 0 or nothing because void
+void displayCurrentPage(char* currentUrl)
+{
+    printf("\nCurrent Web Page: %s\n", currentUrl);
 }
 
 // METHOD       : ReadInputString()
@@ -431,7 +467,7 @@ int main(void)
     Queue* historyQueue = InitializeQueue();
 
     int menuOption;
-    char currentUrl[URL_SIZE] = "";
+    char currentUrl[URL_SIZE] = "None";
     //char newUrl[URL_SIZE];
 
     // run while menuOption is not 6 (exit)
@@ -448,14 +484,16 @@ int main(void)
             visitNewWebPage(backStack, forwardStack, historyQueue, currentUrl);
             break;
         case 2:
-            printf("You have chosen to Navigate Backwards\n");
+            //printf("You have chosen to Navigate Backwards\n");
             navigateBack(backStack, forwardStack, historyQueue, currentUrl);
             break;
         case 3:
-            printf("You have chosen to navigate Forward\n");
+            //printf("You have chosen to navigate Forward\n");
+            navigateForward(backStack, forwardStack, historyQueue, currentUrl);
             break;
         case 4:
-            printf("You have chosen to Display Current Page\n");
+            //printf("You have chosen to Display Current Page\n");
+            displayCurrentPage(currentUrl);
             break;
         case 5:
             printf("You have chosen to Browse History Log\n");
