@@ -3,7 +3,8 @@
  * PROJECT      : Data Structures - Assignment 2
  * PROGRAMMER   : Kiet Ngo
  * FIRST VERSION: 2026-10-28
- * DESCRIPTION  :
+ * DESCRIPTION  : Browser History Manager - Stacks and Queues using a Linked List
+ *              : User can visit websites, navigate forward, backwards web pages and save browsing history
  */
 
 #pragma warning (disable:4996)
@@ -15,6 +16,7 @@
 
 #define URL_SIZE 50
 
+// Structs
 typedef struct StackNode {
     char url[URL_SIZE];
     struct StackNode* next;
@@ -51,6 +53,7 @@ char* dequeue(Queue* queue);
 char* peekQueue(Queue* queue);
 void clearQueue(Queue* queue);
 
+// Function prototype for Navigation
 void DisplayMenu();
 void ReadInputString(char* buffer, int size);
 void visitNewWebPage(Stack* backStack, Stack* forwardStack, Queue* historyQueue, char* currentUrl);
@@ -589,7 +592,15 @@ int main(void)
             displayHistoryLog(historyQueue);
             break;
         case 6:
-            printf("You have chosen to exit program\n");
+            //printf("You have chosen to exit program\n");
+            printf("\nFreeing all memory and exiting program\n");
+            // free all memory
+            clearStack(backStack);
+            clearStack(forwardStack);
+            clearQueue(historyQueue);
+            free(backStack);
+            free(forwardStack);
+            //free(historyQueue); // already freed in clearQueue() method
             break;
         default:
             printf("Invalid choice! Please select an option between 1-6\n");
