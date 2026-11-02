@@ -51,7 +51,8 @@ char* dequeue(Queue* queue);
 char* peekQueue(Queue* queue);
 
 void DisplayMenu();
-
+void ReadInputString(char* buffer, int size);
+void visitNewWebPage(Stack* backStack, Stack* forwardStack, char* currentUrl);
 
 // METHOD       : push()
 // DESCRIPTION  : Adds a new URL to the top of the stack
@@ -285,6 +286,51 @@ char* peekQueue(Queue* queue)
     return queue->front->url;
 }
 
+void visitNewWebPage(Stack* backStack, Stack* forwardStack, char* currentUrl)
+{
+    //char newUrl[URL_SIZE];
+    
+    // NOTE:
+    // temporary substituting newUrl for a inputBuffer with a larger input Buffer to detect more than 50 chars
+    // since fgets will not read more than the 49 chars + NULL terminator
+    // so it will never display error for newUrl input from user that is more than 50 chars
+    char inputBuffer[256];
+
+    printf("\nEnter URL to visit (e.g., google.com): ");
+    // safely read user input for new URL and makes sure that its not empty/NULL
+    //ReadInputString(newUrl, URL_SIZE);
+    ReadInputString(inputBuffer, sizeof(inputBuffer));
+    // checks if newUrl input from user is empty
+    //if (strlen(newUrl) == 0)
+    if (strlen(inputBuffer) == 0)
+    {
+        printf("URL cannot be empty.\n");
+        return;
+    }
+    // checks if newUrl input from user is too long (more than the allowable URL_SIZE: 50)
+    //if (strlen(newUrl) >= URL_SIZE)
+    if (strlen(inputBuffer) >= URL_SIZE)
+    {
+        printf("URL entered is too long. Max %d characters.\n", URL_SIZE - 1);
+        return;
+    }
+    // if newUrl is valid length, copy it into newUrl
+    char newUrl[URL_SIZE];
+    strcpy(newUrl, inputBuffer);
+
+    // if we are currently on a valid active url page, 
+    // push it onto the top of the back stack before switching url pages so user can navigate back to it later
+    if (strcmp(currentUrl, "") != 0)
+    {
+        push(backStack, currentUrl);
+    }
+    // clear the forwardStack so the user cannot navigate forward since they just visited a new page
+    clearStack(forwardStack);
+    // update the current page
+    strncpy(currentUrl, newUrl, URL_SIZE);
+    printf("Currently Visiting: %s\n", currentUrl);
+}
+
 // METHOD       : ReadInputString()
 // DESCRIPTION  : Reads user input and gets rid of trailing \n from fgets
 //              : buffer will point to char array where text will be stored
@@ -315,6 +361,9 @@ void ReadInputString(char* buffer, int size)
 
 }
 
+// METHOD       : DisplayMenu()
+// DESCRIPTION  : Display Browser History Manager menu options to user
+// RETURNS      : returns 0 or nothing because void
 void DisplayMenu()
 {
     printf("\n---- Browser History Manager ----\n");
@@ -334,7 +383,7 @@ int main(void)
 
     int menuOption;
     char currentUrl[URL_SIZE] = "";
-    char newUrl[URL_SIZE];
+    //char newUrl[URL_SIZE];
 
     // run while menuOption is not 6 (exit)
     do
@@ -347,36 +396,7 @@ int main(void)
         {
         case 1:
             //printf("You have chosen to Visit a New Web Page\n");
-
-            printf("Enter URL to visit (e.g., google.com): ");
-            // safely read user input for new URL and makes sure that its not empty/NULL
-            if (fgets(newUrl, sizeof(newUrl), stdin) != NULL)
-            {
-                // fgets records \n so remove newline by replacing it with NULL terminator
-                newUrl[strcspn(newUrl, "\n")] = '\0';
-
-                // checks if newUrl input from user is empty
-                if (strlen(newUrl) == 0) 
-                {
-                    printf("URL cannot be empty.\n");
-                    break;
-                }
-                // checks if newUrl input from user is too long (more than the allowable URL_SIZE: 50)
-                if (strlen(newUrl) >= URL_SIZE) 
-                {
-                    printf("URL entered is too long. Max %d characters).\n", URL_SIZE - 1);
-                    return;
-                }
-                // if we are currently on a valid active url page, 
-                // push it onto the top of the back stack before switching url pages so user can navigate back to it later
-                if (strcmp(currentUrl, "") != 0) 
-                {
-                    push(backStack, currentUrl);
-                }
-                // clear the forwardStack so the user cannot navigate forward since they just visited a new page
-                clearStack(forwardStack);
-                printf("Currently Visiting: %s\n", currentUrl);
-            }
+            visitNewWebPage(backStack, forwardStack, currentUrl);
             break;
         case 2:
             printf("You have chosen to Navigate Backwards\n");
