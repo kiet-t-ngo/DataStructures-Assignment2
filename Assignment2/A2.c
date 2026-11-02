@@ -40,14 +40,18 @@ void push(Stack* stack, char* newUrl);
 char* pop(Stack* stack);
 char* peekStack(Stack* stack);
 bool isStackEmpty(Stack* stack);
+void clearStack(Stack* stack);
 
 // Function prototype for queue
-Queue* InititalizeQueue(void);
+Queue* InitializeQueue(void);
 bool isQueueEmpty(Queue* queue);
 //QueueNode* CreateNewNode(char url);
 void enqueue(Queue* queue, char* newUrl);
 char* dequeue(Queue* queue);
 char* peekQueue(Queue* queue);
+
+void DisplayMenu();
+
 
 // METHOD       : push()
 // DESCRIPTION  : Adds a new URL to the top of the stack
@@ -137,11 +141,23 @@ Stack* InitializeStack(void)
     return stack;
 }
 
+// METHOD       : clearStack()
+// DESCRIPTION  : Clears the stack by popping and freeing memory until the stack is empty
+// RETURNS      : char* pointer to the URL string at the top of 
+void clearStack(Stack* stack)
+{
+    // run until stack is empty
+    while (!isStackEmpty(stack))
+    {
+        free(pop(stack));
+    }
+}
+
 // METHOD       : InitializeQueue()
 // DESCRIPTION  : Allocates memory for new empty queue, checks for memory allocation
 //              : and sets queue front and rear pointer to NULL
 // RETURNS      : Pointer to newly initialized queue
-Queue* InititalizeQueue(void) 
+Queue* InitializeQueue(void) 
 {
     // allocating memory for node
     Queue* queue = (Queue*)malloc(sizeof(Queue));
@@ -192,7 +208,7 @@ void enqueue(Queue* queue, char* newUrl)
     /* // From Week5_Queue example
     if (queue == NULL)
     {
-        //queue = InititalizeQueue();
+        //queue = InitializeQueue();
     }
     
     QueueNode* toEnqueue = CreateNewNode(newUrl);
@@ -233,7 +249,7 @@ char* dequeue(Queue* queue)
 {
     // Calls isQueueEmpty() method to check if queue is empty
     // If it is empty, display error and return null
-    if (IsQueueEmpty(queue)) 
+    if (isQueueEmpty(queue)) 
     {
         printf("Queue is Empty");
         return NULL;
@@ -269,6 +285,36 @@ char* peekQueue(Queue* queue)
     return queue->front->url;
 }
 
+// METHOD       : ReadInputString()
+// DESCRIPTION  : Reads user input and gets rid of trailing \n from fgets
+//              : buffer will point to char array where text will be stored
+//              : size is the maximum number of characters the buffer can hold
+// RETURNS      : returns 0 or nothing because void
+void ReadInputString(char* buffer, int size)
+{
+    // Note: basically the code from Assignment 1 copy pasted
+    // read user input and ensures its valid or not empty
+    if (fgets(buffer, size, stdin) == NULL)
+    {
+        buffer[0] = '\0';
+        return;
+    }
+    size_t length = strlen(buffer); // calculates the length of the string currently stored inside buffer and saves into length variable
+    // checks if string is not empty and if the last character read is \n, if its true than replace the trailing \n with a \0
+    if (length > 0 && buffer[length - 1] == '\n') {
+        buffer[length - 1] = '\0';
+    }
+    else
+    {
+        // Clears out remaining characters inside stdin until it reachs a \n or end of file
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
+    }
+    // From GetString() example demo, gets rid of trailing \n from fgets
+    //buffer[strcspn(buffer, "\n")] = '\0';
+
+}
+
 void DisplayMenu()
 {
     printf("\n---- Browser History Manager ----\n");
@@ -287,10 +333,70 @@ int main(void)
     Stack* forwardStack = InitializeStack();
 
     int menuOption;
+    char currentUrl[URL_SIZE] = "";
+    char newUrl[URL_SIZE];
 
     // run while menuOption is not 6 (exit)
     do
     {
         DisplayMenu();
+        scanf("%d", &menuOption); // get menu option input from user
+        while (getchar() != '\n'); // clear input buffer
+
+        switch (menuOption)
+        {
+        case 1:
+            //printf("You have chosen to Visit a New Web Page\n");
+
+            printf("Enter URL to visit (e.g., google.com): ");
+            // safely read user input for new URL and makes sure that its not empty/NULL
+            if (fgets(newUrl, sizeof(newUrl), stdin) != NULL)
+            {
+                // fgets records \n so remove newline by replacing it with NULL terminator
+                newUrl[strcspn(newUrl, "\n")] = '\0';
+
+                // checks if newUrl input from user is empty
+                if (strlen(newUrl) == 0) 
+                {
+                    printf("URL cannot be empty.\n");
+                    break;
+                }
+                // checks if newUrl input from user is too long (more than the allowable URL_SIZE: 50)
+                if (strlen(newUrl) >= URL_SIZE) 
+                {
+                    printf("URL entered is too long. Max %d characters).\n", URL_SIZE - 1);
+                    return;
+                }
+                // if we are currently on a valid active url page, 
+                // push it onto the top of the back stack before switching url pages so user can navigate back to it later
+                if (strcmp(currentUrl, "") != 0) 
+                {
+                    push(backStack, currentUrl);
+                }
+                // clear the forwardStack so the user cannot navigate forward since they just visited a new page
+                clearStack(forwardStack);
+                printf("Currently Visiting: %s\n", currentUrl);
+            }
+            break;
+        case 2:
+            printf("You have chosen to Navigate Backwards\n");
+            break;
+        case 3:
+            printf("You have chosen to navigate Forward\n");
+            break;
+        case 4:
+            printf("You have chosen to Display Current Page\n");
+            break;
+        case 5:
+            printf("You have chosen to Browse History Log\n");
+            break;
+        case 6:
+            printf("You have chosen to exit program\n");
+            break;
+        default:
+            printf("Invalid choice! Please select an option between 1-6\n");
+        }
     } while (menuOption != 6);
+
+    return 0;
 }
