@@ -49,10 +49,12 @@ bool isQueueEmpty(Queue* queue);
 void enqueue(Queue* queue, char* newUrl);
 char* dequeue(Queue* queue);
 char* peekQueue(Queue* queue);
+void clearQueue(Queue* queue);
 
 void DisplayMenu();
 void ReadInputString(char* buffer, int size);
-void visitNewWebPage(Stack* backStack, Stack* forwardStack, char* currentUrl);
+void visitNewWebPage(Stack* backStack, Stack* forwardStack, Queue* historyQueue, char* currentUrl);
+void navigateBack(Stack* backStack, Stack* forwardStack, Queue* historyQueue, char* currentUrl);
 
 // METHOD       : push()
 // DESCRIPTION  : Adds a new URL to the top of the stack
@@ -144,7 +146,7 @@ Stack* InitializeStack(void)
 
 // METHOD       : clearStack()
 // DESCRIPTION  : Clears the stack by popping and freeing memory until the stack is empty
-// RETURNS      : char* pointer to the URL string at the top of 
+// RETURNS      : returns 0 or nothing because void
 void clearStack(Stack* stack)
 {
     // run until stack is empty
@@ -286,7 +288,24 @@ char* peekQueue(Queue* queue)
     return queue->front->url;
 }
 
-void visitNewWebPage(Stack* backStack, Stack* forwardStack, char* currentUrl)
+// METHOD       : clearQueue()
+// DESCRIPTION  : Clears the stack by popping and freeing memory until the queue is empty
+// RETURNS      : returns 0 or nothing because void
+void clearQueue(Queue* queue) 
+{
+    while (!isQueueEmpty(queue)) 
+    {
+        free(dequeue(queue));
+    }
+    free(queue);
+}
+
+// METHOD       : visitNewWebpage()
+// DESCRIPTION  : Asks user to enter a new URL
+//              : Validates the new URL input from user to ensure its not empty or more than 50 chars long
+//              : Saves current page to the back stack, clears forward stack and updates current active URL
+// RETURNS      : returns 0 or nothing because void
+void visitNewWebPage(Stack* backStack, Stack* forwardStack, Queue* historyQueue, char* currentUrl)
 {
     //char newUrl[URL_SIZE];
     
@@ -329,6 +348,35 @@ void visitNewWebPage(Stack* backStack, Stack* forwardStack, char* currentUrl)
     // update the current page
     strncpy(currentUrl, newUrl, URL_SIZE);
     printf("Currently Visiting: %s\n", currentUrl);
+}
+
+// METHOD       : navigateBack()
+// DESCRIPTION  : Navigates back to previous web page url by popping the url from the back stack
+//              : Pushes the current URL to the forward stack, and updates current URL
+// RETURNS      : returns 0 or nothing because void
+void navigateBack(Stack* backStack, Stack* forwardStack, Queue* historyQueue, char* currentUrl)
+{
+    // checks if backStack is empty and displays error if it is empty
+    if (isStackEmpty(backStack))
+    {
+        printf("No previous page to go back to.\n");
+    }
+    else
+    {
+        // push the current page to the forward stack since we are navigating back
+        push(forwardStack, currentUrl);
+        
+        // Pop the previous page from the back stack
+        char* prevUrl = pop(backStack);
+        // update the current page
+        strncpy(currentUrl, prevUrl, URL_SIZE);
+        // free memory
+        free(prevUrl);
+
+        char* current = peekStack(backStack);
+
+        printf("\nNavigated back to: %s\n", currentUrl);
+    }
 }
 
 // METHOD       : ReadInputString()
@@ -380,6 +428,7 @@ int main(void)
 {
     Stack* backStack = InitializeStack();
     Stack* forwardStack = InitializeStack();
+    Queue* historyQueue = InitializeQueue();
 
     int menuOption;
     char currentUrl[URL_SIZE] = "";
@@ -396,10 +445,11 @@ int main(void)
         {
         case 1:
             //printf("You have chosen to Visit a New Web Page\n");
-            visitNewWebPage(backStack, forwardStack, currentUrl);
+            visitNewWebPage(backStack, forwardStack, historyQueue, currentUrl);
             break;
         case 2:
             printf("You have chosen to Navigate Backwards\n");
+            navigateBack(backStack, forwardStack, historyQueue, currentUrl);
             break;
         case 3:
             printf("You have chosen to navigate Forward\n");
