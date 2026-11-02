@@ -57,6 +57,8 @@ void visitNewWebPage(Stack* backStack, Stack* forwardStack, Queue* historyQueue,
 void navigateBack(Stack* backStack, Stack* forwardStack, Queue* historyQueue, char* currentUrl);
 void navigateForward(Stack* backStack, Stack* forwardStack, Queue* historyQueue, char* currentUrl);
 void displayCurrentPage(char* currentUrl);
+void recordHistory(Queue* queue, char* url);
+void displayHistoryLog(Queue* queue);
 
 // METHOD       : push()
 // DESCRIPTION  : Adds a new URL to the top of the stack
@@ -349,6 +351,9 @@ void visitNewWebPage(Stack* backStack, Stack* forwardStack, Queue* historyQueue,
     clearStack(forwardStack);
     // update the current page
     strncpy(currentUrl, newUrl, URL_SIZE);
+    // update and record history
+    recordHistory(historyQueue, currentUrl);
+
     printf("Currently Visiting: %s\n", currentUrl);
 }
 
@@ -374,6 +379,8 @@ void navigateBack(Stack* backStack, Stack* forwardStack, Queue* historyQueue, ch
         strncpy(currentUrl, prevUrl, URL_SIZE);
         // free memory
         free(prevUrl);
+        // update and record history queue order
+        recordHistory(historyQueue, currentUrl);
 
         printf("\nNavigated back to: %s\n", currentUrl);
     }
@@ -401,6 +408,8 @@ void navigateForward(Stack* backStack, Stack* forwardStack, Queue* historyQueue,
         strncpy(currentUrl, nextUrl, URL_SIZE);
         // free memory
         free(nextUrl);
+        // update and record history queue order
+        recordHistory(historyQueue, currentUrl);
 
         printf("\nNavigated forward to: %s\n", currentUrl);
     }
@@ -413,6 +422,86 @@ void navigateForward(Stack* backStack, Stack* forwardStack, Queue* historyQueue,
 void displayCurrentPage(char* currentUrl)
 {
     printf("\nCurrent Web Page: %s\n", currentUrl);
+}
+
+// METHOD       : recordHistory()
+// DESCRIPTION  : Records the url in the browsing history queue.
+//              : If the url already exists in the queue, it is removed from its current position before being readded 
+// RETURNS      : returns 0 or nothing because void
+void recordHistory(Queue* queue, char* url)
+{
+    // set current to front node of the queue
+    QueueNode* current = queue->front;
+    QueueNode* prev = NULL;
+
+    // will be used to track if url already exists in the queue/browsing history
+    bool found = false; 
+
+    // current is set to front so loop thru front to rear until the end is reached/NULL
+    while (current != NULL) 
+    {
+        // checks if the current url matches a stored url node
+        // if they match, return 0 and set found boolean to true
+        if (strcmp(current->url, url) == 0) 
+        {
+            found = true; // found a matching url node
+            break; // exit to if(found) below since a duplicate was found
+        }
+        prev = current;
+        current = current->next;
+    }
+    // if a matching/duplicate url was found (true)
+    if (found) 
+    {
+        // check if duplicate is at the front of the queue
+        if (current == queue->front) 
+        {
+            // update queue front pointer to the next node removing the old
+            queue->front = current->next;
+            if (queue->front == NULL)
+            {
+                queue->rear = NULL;
+            }
+        }
+        // else, the duplicate is found between the middle or rear of the queue
+        else 
+        {
+            // bypass the current node by linking the previous node to the next current node
+            prev->next = current->next;
+            if (current == queue->rear) 
+            {
+                queue->rear = prev;
+            }
+        }
+        free(current); // free memory
+    }
+    // Add the url at the back of the queue
+    enqueue(queue, url);
+}
+
+// METHOD       : displayHistoryLog()
+// DESCRIPTION  : Displays the browsing history stored in the queue
+//              : If the queue is empty, will print that there is no browsing history message
+// RETURNS      : returns 0 or nothing because void
+void displayHistoryLog(Queue* queue)
+{
+    // set current to front node of the queue
+    QueueNode* current = queue->front;
+
+    // checks if queue is empty and displays error if it is empty
+    if (isQueueEmpty(queue))
+    {
+        printf("\nNo browsing history.\n");
+        return; // return to main menu
+    }
+
+    int i = 1; // counter for printed list of browsing history
+    // loop thru each node in the queue until the end of the list is reached/NULL
+    while (current != NULL) 
+    {
+        printf("%d. %s\n", i++, current->url);
+        current = current->next;
+    }
 }
 
 // METHOD       : ReadInputString()
@@ -496,7 +585,8 @@ int main(void)
             displayCurrentPage(currentUrl);
             break;
         case 5:
-            printf("You have chosen to Browse History Log\n");
+            //printf("You have chosen to Browse History Log\n");
+            displayHistoryLog(historyQueue);
             break;
         case 6:
             printf("You have chosen to exit program\n");
